@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Doctor.DoctorQuestionsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Sorular"
+    Padding="16,48,16,12"
+    BackgroundColor="{StaticResource Color.Background}">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Sorular" Style="{StaticResource Text.H1}" />
+
+                <!-- Filtreler -->
+                <HorizontalStackLayout Spacing="8">
+                    <Button Text="Tümü" Clicked="OnChip" ClassId="all"/>
+                    <Button Text="Cevapsız" Clicked="OnChip" ClassId="open"/>
+                    <Button Text="Yanıtlandı" Clicked="OnChip" ClassId="answered"/>
+                </HorizontalStackLayout>
+
+                <!-- Tarih aralığı -->
+                <Grid ColumnDefinitions="*,16,*">
+                    <VerticalStackLayout>
+                        <Label Text="Başlangıç" FontSize="12" TextColor="{StaticResource Color.Muted}" />
+                        <DatePicker x:Name="DpStart" DateSelected="OnDateChanged"/>
+                    </VerticalStackLayout>
+                    <BoxView Grid.Column="1" WidthRequest="16" Opacity="0"/>
+                    <VerticalStackLayout Grid.Column="2">
+                        <Label Text="Bitiş" FontSize="12" TextColor="{StaticResource Color.Muted}" />
+                        <DatePicker x:Name="DpEnd" DateSelected="OnDateChanged"/>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Arama -->
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Entry x:Name="TxtQuery" Placeholder="Başlık / içerik / yanıt içinde ara..." Completed="OnSearch"/>
+                    <Button Grid.Column="1" Text="Ara" Clicked="OnSearch"/>
+                </Grid>
+
+                <!-- Liste -->
+                <CollectionView x:Name="List" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Kayıt yok." HorizontalOptions="Center" Margin="0,20"
+                               TextColor="{StaticResource Color.Muted}"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Style="{StaticResource Card}" Margin="0,6" Padding="12">
+                                <VerticalStackLayout Spacing="10">
+
+                                    <!-- Üst satır: Başlık + Durum -->
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
+                                        <Label Text="{Binding Title}" FontAttributes="Bold" LineBreakMode="TailTruncation"/>
+                                        <Frame Grid.Column="1" Padding="6,2" CornerRadius="10" HasShadow="False"
+                                               BackgroundColor="{Binding BadgeColor}">
+                                            <Label Text="{Binding StatusText}" TextColor="White" FontAttributes="Bold"/>
+                                        </Frame>
+
+                                        <!-- Hasta adı + zaman -->
+                                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Label Text="👤" />
+                                                <Label Text="{Binding PatientName}" TextColor="{StaticResource Color.Muted}" />
+                                            </HorizontalStackLayout>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding CreatedAt, StringFormat='Soruldu: {0:dd.MM.yyyy HH:mm}'}"
+                                                   FontSize="12" TextColor="{StaticResource Color.Muted}"
+                                                   HorizontalTextAlignment="End"/>
+                                        </Grid>
+                                    </Grid>
+
+                                    <!-- Soru gövdesi -->
+                                    <Label Text="{Binding Body}" LineBreakMode="WordWrap"/>
+
+                                    <!-- Yanıt alanı (sadece Cevapsız iken) -->
+                                    <Grid ColumnDefinitions="*,Auto"
+                                      ColumnSpacing="8"
+                                      IsVisible="{Binding Status, Converter={StaticResource EqualsConverter}, ConverterParameter=Open}">
+                                                                        <Editor x:Name="EdAnswer"
+                                            Grid.Column="0"
+                                            Placeholder="Yanıt yazın..."
+                                            AutoSize="TextChanges"
+                                            BackgroundColor="{StaticResource Color.Surface}"
+                                            HeightRequest="92"
+                                            Margin="0,0,0,6"/>
+
+                                                                        <Button Grid.Column="1"
+                                            Text="Yanıtla"
+                                            HeightRequest="40"
+                                            VerticalOptions="End"
+                                            Clicked="OnAnswer"
+                                            CommandParameter="{Binding .}"
+                                            Style="{StaticResource Btn.Primary}" />
+                                                                    </Grid>
+
+
+                                    <VerticalStackLayout
+    IsVisible="{Binding AnswerText, Converter={StaticResource StringNullOrEmptyToBoolConverter}, ConverterParameter=invert}">
+                                        <Label Text="Yanıt:" FontAttributes="Bold"/>
+                                        <Label Text="{Binding AnswerText}" LineBreakMode="WordWrap"/>
+                                        <Label Text="{Binding AnsweredAt, StringFormat='Yanıt: {0:dd.MM.yyyy HH:mm}'}"
+           FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Aksiyonlar -->
+                                    <Grid>
+                                        <Button Text="Detay"
+            HorizontalOptions="End"
+            Clicked="OnOpenDetail"
+            CommandParameter="{Binding .}"
+            HeightRequest="36" CornerRadius="10"
+            Style="{StaticResource Btn.Outline}" />
+                                    </Grid>
+
+
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <BoxView HeightRequest="24" Opacity="0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

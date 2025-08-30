@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Doctor.PatientDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource Color.Background}"
+    Title="Kişi Detayı"
+    Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Rapor" Priority="0" Order="Primary" Clicked="OpenReport" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Resources>
+        <!-- rozet -->
+        <Style x:Key="Badge" TargetType="Frame">
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="HasShadow" Value="False"/>
+            <Setter Property="BackgroundColor" Value="#E5E7EB"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- Gradient başlık -->
+        <Border>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="18"/>
+            </Border.StrokeShape>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#6D28D9" Offset="0"/>
+                    <GradientStop Color="#4F46E5" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Border WidthRequest="44" HeightRequest="44" StrokeThickness="0"
+                        BackgroundColor="#33111827" StrokeShape="RoundRectangle 22"
+                        VerticalOptions="Center">
+                    <Label Text="👤" FontSize="22" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label x:Name="TitleName" Text="-" TextColor="White" FontSize="22" FontAttributes="Bold"/>
+                    <Label x:Name="LblEmail" TextColor="#E5E7EB" FontSize="13"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="12">
+
+                <!-- İletişim (kısa) -->
+                <Frame Style="{StaticResource Card}">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
+                        <Label Text="Telefon" TextColor="{StaticResource Color.Muted}"/>
+                        <Label x:Name="LblPhone" Grid.Row="0" Grid.Column="1" FontAttributes="Bold"/>
+
+                        <Label Grid.Row="1" Text="Günlük su hedefi" TextColor="{StaticResource Color.Muted}"/>
+                        <Label x:Name="LblWater" Grid.Row="1" Grid.Column="1" FontAttributes="Bold"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Aktif/Yakında/Bitti kartı + ilerleme -->
+                <Frame Style="{StaticResource Card}">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+
+                        <!-- satır 0: rozet + tarih aralığı -->
+                        <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Frame x:Name="ActiveBadge" Style="{StaticResource Badge}" BackgroundColor="#9CA3AF" VerticalOptions="Center">
+                                <Label x:Name="LblActiveBadge" Text="Aktif değil" TextColor="White" FontAttributes="Bold" FontSize="12"/>
+                            </Frame>
+                            <Label x:Name="LblProgram" Grid.Column="1" FontAttributes="Bold" LineBreakMode="TailTruncation"/>
+                        </Grid>
+
+                        <!-- satır 1: durum detayı (kalan gün, başlangıca, bitti vb.) -->
+                        <Label x:Name="LblStatusDetail" Grid.Row="1" Grid.ColumnSpan="2"
+                               TextColor="{StaticResource Color.Muted}" FontSize="12"/>
+
+                        <!-- satır 2: progress başlığı -->
+                        <Grid x:Name="ProgressRow" Grid.Row="2" Grid.ColumnSpan="2" IsVisible="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Text="İlerleme" TextColor="{StaticResource Color.Muted}" />
+                            <Label x:Name="LblProgressText" Grid.Column="1" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                        </Grid>
+
+                        <!-- satır 3: progress bar -->
+                        <ProgressBar x:Name="PrgActive" Grid.Row="3" Grid.ColumnSpan="2" HeightRequest="8"
+                                     IsVisible="False"
+                                     BackgroundColor="{AppThemeBinding Light=#EEF2FF, Dark=#1F2937}"
+                                     ProgressColor="#6D28D9"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Programlar -->
+                <Label Text="Programlar" Style="{StaticResource Text.H2}"/>
+
+                <CollectionView x:Name="ProgramsList" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Program bulunamadı." HorizontalOptions="Center" TextColor="{StaticResource Color.Muted}"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Style="{StaticResource Card}" Margin="0,6">
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Frame Style="{StaticResource Badge}" BackgroundColor="{Binding BadgeColor}">
+                                            <Label Text="{Binding Status}" TextColor="White" FontSize="12" FontAttributes="Bold"/>
+                                        </Frame>
+                                        <Label Text="{Binding Range}" FontAttributes="Bold"/>
+                                    </HorizontalStackLayout>
+                                    <Label Grid.Row="1" Text="{Binding Info}" TextColor="{StaticResource Color.Muted}"/>
+
+                                    <Button Grid.Column="1" Grid.RowSpan="2" Text="Aç" VerticalOptions="Center"
+                                            Clicked="OpenProgram" CommandParameter="{Binding .}"/>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Alt aksiyonlar -->
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <Button Text="Rapor" Style="{StaticResource Btn.Outline}" Clicked="OpenReport"/>
+                    <Button Grid.Column="1" Text="Yeni Program" Style="{StaticResource Btn.Primary}" Clicked="CreateProgram"/>
+                </Grid>
+
+                <BoxView HeightRequest="24" Opacity="0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Busy Overlay -->
+        <Grid x:Name="BusyOverlay" Grid.RowSpan="2" BackgroundColor="#80000000" IsVisible="False" InputTransparent="True">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                <ActivityIndicator IsRunning="True" Scale="1.2"/>
+                <Label x:Name="BusyText" Text="Yükleniyor..." TextColor="White" FontAttributes="Bold"/>
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
+</ContentPage>

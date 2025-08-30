@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:DietMVP.Controls"
+             x:Class="DietMVP.Pages.Doctor.PatientsPage"
+             Title="Kişiler"
+             BackgroundColor="{StaticResource Color.Background}"
+             Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}">
+
+    <ContentPage.Resources>
+        <!-- yumuşak kart -->
+        <Style x:Key="SoftCard" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="18"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Shadow">
+                <Shadow Brush="#000" Opacity="0.06" Radius="12"/>
+            </Setter>
+        </Style>
+
+        <!-- küçük sekonder buton -->
+        <Style x:Key="Chip" TargetType="Button">
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#EEF2FF, Dark=#1F2937}"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#4338CA, Dark=#C7D2FE}"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="12">
+
+        <!-- HERO / üst şerit -->
+        <Border>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="18"/>
+            </Border.StrokeShape>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#6D28D9" Offset="0"/>
+                    <GradientStop Color="#4F46E5" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Border StrokeThickness="0" BackgroundColor="#33111827"
+                        WidthRequest="44" HeightRequest="44"
+                        StrokeShape="RoundRectangle 22" VerticalOptions="Center">
+                    <Label Text="👥" FontSize="22" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Kişiler" TextColor="White" FontSize="22" FontAttributes="Bold"/>
+                    <!-- mevcut Stats label'ını burada kullanıyoruz -->
+                    <Label x:Name="Stats" TextColor="#E5E7EB" FontSize="13"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Arama + hızlı aksiyonlar -->
+        <Border Grid.Row="1" Style="{StaticResource SoftCard}">
+            <VerticalStackLayout Spacing="10">
+
+                <!-- arama -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Border StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#1F2937}"
+                            WidthRequest="40" HeightRequest="40"
+                            StrokeShape="RoundRectangle 12" VerticalOptions="Center">
+                        <Image Source="ic_search.png" WidthRequest="18" HeightRequest="18" Margin="11"/>
+                    </Border>
+                    <Entry x:Name="SearchEntry"
+                           Grid.Column="1"
+                           Placeholder="İsim ya da e-posta ile ara"
+                           ClearButtonVisibility="WhileEditing"
+                           TextChanged="OnSearchChanged"/>
+                </Grid>
+
+                <!-- hızlı butonlar -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Button Grid.Column="0" Text="Yeni Hasta" Style="{StaticResource Chip}" Clicked="OnAddNew"/>
+                    <Button Grid.Column="1" Text="Programa Yönlendir" Style="{StaticResource Chip}" Clicked="OnOpenQuickProgram"/>
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- LİSTE + busy + toast -->
+        <Grid Grid.Row="2">
+
+            <RefreshView x:Name="RefreshViewControl" Refreshing="OnRefresh">
+                <CollectionView x:Name="PatientsList" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="24" Spacing="6">
+                            <Label Text="Kişi bulunamadı" HorizontalOptions="Center" TextColor="{StaticResource Color.Muted}"/>
+                            <Label Text="Yukarıdaki aramayı deneyebilirsin." HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <!-- Swipe ile hızlı aksiyon -->
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems Mode="Execute">
+                                        <SwipeItem Text="Detay" BackgroundColor="#4F46E5" IconImageSource="ic_info.png"
+                                                   CommandParameter="{Binding .}"
+                                                   Invoked="OnSwipeDetail"/>
+                                        <SwipeItem Text="Rapor" BackgroundColor="#10B981" IconImageSource="ic_dashboard.png"
+                                                   CommandParameter="{Binding .}"
+                                                   Invoked="OnSwipeReport"/>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <Border Style="{StaticResource SoftCard}" Padding="12">
+                                    <!-- [Avatar]  [Ad + e-posta + su]  [Butonlar] -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+
+                                        <!-- Avatar -->
+                                        <Border WidthRequest="46" HeightRequest="46" StrokeThickness="0"
+                                                BackgroundColor="{StaticResource Color.Border}"
+                                                StrokeShape="RoundRectangle 23" VerticalOptions="Center">
+                                            <Image Source="{Binding PhotoUrl, TargetNullValue=ic_avatar.png}" Aspect="AspectFill"/>
+                                        </Border>
+
+                                        <!-- Metinler -->
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                            <Label Text="{Binding FullName}" FontAttributes="Bold" FontSize="16"
+                                                   TextColor="{StaticResource Color.Ink}"/>
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <Label Text="{Binding Email}" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding DailyWaterTargetMl, StringFormat='Günlük su: {0} ml'}"
+                                                       FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                                            </Grid>
+                                        </VerticalStackLayout>
+
+                                        <!-- Sağ butonlar -->
+                                        <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
+                                            <Button Text="Detay" HeightRequest="36" CornerRadius="10"
+                                                    CommandParameter="{Binding .}"
+                                                    Clicked="OnGoDetail"
+                                                    Style="{StaticResource Btn.Outline}"/>
+                                            <Button Text="Rapor" HeightRequest="36" CornerRadius="10"
+                                                    CommandParameter="{Binding .}"
+                                                    Clicked="OnGoReport"
+                                                    Style="{StaticResource Btn.Primary}"/>
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <!-- mini-busy: alt sheet gibi -->
+            <Grid x:Name="BusyOverlay" IsVisible="False" InputTransparent="False">
+                <Grid RowDefinitions="*,Auto,40">
+                    <Border Grid.Row="1" BackgroundColor="{AppThemeBinding Light=#FFFFFFFF, Dark=#172033F0}"
+                            StrokeThickness="0" Padding="14" Margin="16"
+                            TranslationY="40" Opacity="0" x:Name="BusyCard">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18"/>
+                        </Border.StrokeShape>
+                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                            <ActivityIndicator IsRunning="True"/>
+                            <Label x:Name="BusyText" Text="Yükleniyor..." 
+                                   TextColor="{AppThemeBinding Light=#111827, Dark=#E5E7EB}" 
+                                   FontAttributes="Bold"/>
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <controls:ToastOverlay x:Name="ToastHost" InputTransparent="True"/>
+        </Grid>
+    </Grid>
+</ContentPage>

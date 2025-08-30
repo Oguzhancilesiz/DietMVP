@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Doctor.ProgramWizardPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Program Sihirbazı"
+    Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}"
+    BackgroundColor="{AppThemeBinding Light=#F7F8FA, Dark=#0B1220}">
+
+    <ContentPage.Resources>
+        <!-- Yumuşak kart -->
+        <Style x:Key="SoftCard" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="18"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="0,10"/>
+            <Setter Property="Shadow">
+                <Shadow Brush="#000" Opacity="0.06" Radius="12" />
+            </Setter>
+        </Style>
+
+        <!-- Alan etiketi -->
+        <Style x:Key="FieldLabel" TargetType="Label">
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#374151, Dark=#9CA3AF}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <!-- Bölüm başlığı -->
+        <Style x:Key="SectionTitle" TargetType="Label">
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#111827, Dark=#E5E7EB}"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <!-- Birincil buton -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="#4F46E5"/>
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="HeightRequest" Value="52"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+        </Style>
+
+        <!-- İpucu -->
+        <Style x:Key="HintText" TargetType="Label">
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#6B7280, Dark=#94A3B8}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <!-- Chip -->
+        <Style x:Key="Chip" TargetType="Button">
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F3F4F6, Dark=#1F2937}"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#111827, Dark=#E5E7EB}"/>
+            <Setter Property="BorderColor" Value="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+
+        <ScrollView>
+            <VerticalStackLayout Spacing="14">
+
+                <!-- HERO -->
+                <Border>
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="18"/>
+                    </Border.StrokeShape>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#8B5CF6" Offset="0"/>
+                            <GradientStop Color="#2563EB" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+
+                    <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border WidthRequest="44" HeightRequest="44" StrokeThickness="0"
+                                BackgroundColor="#33111827" StrokeShape="RoundRectangle 22"
+                                VerticalOptions="Center">
+                            <Label Text="🧩" FontSize="22" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Program Sihirbazı" TextColor="White" FontSize="22" FontAttributes="Bold"/>
+                            <Label x:Name="PatientName" TextColor="#E5E7EB" FontSize="13"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Takvim + Gün sayısı -->
+                <Border Style="{StaticResource SoftCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Süre" Style="{StaticResource SectionTitle}"/>
+
+                        <Grid ColumnDefinitions="*,120" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Başlangıç Tarihi" Style="{StaticResource FieldLabel}"/>
+                                <DatePicker x:Name="StartDate"/>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="Gün Sayısı" Style="{StaticResource FieldLabel}"/>
+                                <Entry x:Name="DaysEntry" Placeholder="30" Text="30" Keyboard="Numeric" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <Label Text="İpucu: 4–12 hafta arası planlar en iyi uyumu sağlar." Style="{StaticResource HintText}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Öğünler -->
+                <Border Style="{StaticResource SoftCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Öğünler ve Saat Aralıkları" Style="{StaticResource SectionTitle}"/>
+
+                        <!-- Kahvaltı -->
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="4" Padding="6,4">
+                            <CheckBox x:Name="ChkBr" Grid.RowSpan="2" IsChecked="True"/>
+                            <Label Text="Kahvaltı 🍳" Grid.Column="1" VerticalOptions="Center"/>
+                            <Label Text="Başlangıç" Grid.Column="2" Style="{StaticResource HintText}"/>
+                            <Label Text="Bitiş" Grid.Column="3" Style="{StaticResource HintText}"/>
+                            <TimePicker x:Name="BrStart" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding Source={x:Reference ChkBr}, Path=IsChecked}"/>
+                            <TimePicker x:Name="BrEnd"   Grid.Row="1" Grid.Column="3" IsEnabled="{Binding Source={x:Reference ChkBr}, Path=IsChecked}"/>
+                            <Grid.Triggers>
+                                <DataTrigger TargetType="Grid" Binding="{Binding Source={x:Reference ChkBr}, Path=IsChecked}" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </DataTrigger>
+                            </Grid.Triggers>
+                        </Grid>
+
+                        <!-- Ara Öğün 1 -->
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="4" Padding="6,4">
+                            <CheckBox x:Name="ChkS1" Grid.RowSpan="2"/>
+                            <Label Text="Ara Öğün 1 🥪" Grid.Column="1" VerticalOptions="Center"/>
+                            <Label Text="Başlangıç" Grid.Column="2" Style="{StaticResource HintText}"/>
+                            <Label Text="Bitiş" Grid.Column="3" Style="{StaticResource HintText}"/>
+                            <TimePicker x:Name="S1Start" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding Source={x:Reference ChkS1}, Path=IsChecked}"/>
+                            <TimePicker x:Name="S1End"   Grid.Row="1" Grid.Column="3" IsEnabled="{Binding Source={x:Reference ChkS1}, Path=IsChecked}"/>
+                            <Grid.Triggers>
+                                <DataTrigger TargetType="Grid" Binding="{Binding Source={x:Reference ChkS1}, Path=IsChecked}" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </DataTrigger>
+                            </Grid.Triggers>
+                        </Grid>
+
+                        <!-- Öğle -->
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="4" Padding="6,4">
+                            <CheckBox x:Name="ChkLu" Grid.RowSpan="2" IsChecked="True"/>
+                            <Label Text="Öğle 🍛" Grid.Column="1" VerticalOptions="Center"/>
+                            <Label Text="Başlangıç" Grid.Column="2" Style="{StaticResource HintText}"/>
+                            <Label Text="Bitiş" Grid.Column="3" Style="{StaticResource HintText}"/>
+                            <TimePicker x:Name="LuStart" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding Source={x:Reference ChkLu}, Path=IsChecked}"/>
+                            <TimePicker x:Name="LuEnd"   Grid.Row="1" Grid.Column="3" IsEnabled="{Binding Source={x:Reference ChkLu}, Path=IsChecked}"/>
+                            <Grid.Triggers>
+                                <DataTrigger TargetType="Grid" Binding="{Binding Source={x:Reference ChkLu}, Path=IsChecked}" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </DataTrigger>
+                            </Grid.Triggers>
+                        </Grid>
+
+                        <!-- Ara Öğün 2 -->
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="4" Padding="6,4">
+                            <CheckBox x:Name="ChkS2" Grid.RowSpan="2"/>
+                            <Label Text="Ara Öğün 2 🥗" Grid.Column="1" VerticalOptions="Center"/>
+                            <Label Text="Başlangıç" Grid.Column="2" Style="{StaticResource HintText}"/>
+                            <Label Text="Bitiş" Grid.Column="3" Style="{StaticResource HintText}"/>
+                            <TimePicker x:Name="S2Start" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding Source={x:Reference ChkS2}, Path=IsChecked}"/>
+                            <TimePicker x:Name="S2End"   Grid.Row="1" Grid.Column="3" IsEnabled="{Binding Source={x:Reference ChkS2}, Path=IsChecked}"/>
+                            <Grid.Triggers>
+                                <DataTrigger TargetType="Grid" Binding="{Binding Source={x:Reference ChkS2}, Path=IsChecked}" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </DataTrigger>
+                            </Grid.Triggers>
+                        </Grid>
+
+                        <!-- Akşam -->
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="4" Padding="6,4">
+                            <CheckBox x:Name="ChkDi" Grid.RowSpan="2" IsChecked="True"/>
+                            <Label Text="Akşam 🍽️" Grid.Column="1" VerticalOptions="Center"/>
+                            <Label Text="Başlangıç" Grid.Column="2" Style="{StaticResource HintText}"/>
+                            <Label Text="Bitiş" Grid.Column="3" Style="{StaticResource HintText}"/>
+                            <TimePicker x:Name="DiStart" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding Source={x:Reference ChkDi}, Path=IsChecked}"/>
+                            <TimePicker x:Name="DiEnd"   Grid.Row="1" Grid.Column="3" IsEnabled="{Binding Source={x:Reference ChkDi}, Path=IsChecked}"/>
+                            <Grid.Triggers>
+                                <DataTrigger TargetType="Grid" Binding="{Binding Source={x:Reference ChkDi}, Path=IsChecked}" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </DataTrigger>
+                            </Grid.Triggers>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Hata/mesaj -->
+                <Label x:Name="Msg" IsVisible="False" TextColor="#DC2626" />
+
+                <!-- Oluştur -->
+                <Button Text="Programı Oluştur" Style="{StaticResource PrimaryButton}" Clicked="OnCreate"/>
+                <BoxView HeightRequest="20" Opacity="0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Busy (ortalanmış, animasyonlu) -->
+        <Grid x:Name="BusyOverlay" IsVisible="False" InputTransparent="False"
+              BackgroundColor="{AppThemeBinding Light=#00000066, Dark=#00000099}">
+            <Border x:Name="BusyCard" Padding="16" StrokeThickness="0" Opacity="0" Scale="0.96"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFFFF, Dark=#172033F0}"
+                    HorizontalOptions="Center" VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="True"/>
+                    <Label x:Name="BusyText" Text="Lütfen bekleyin..."
+                           TextColor="{AppThemeBinding Light=#111827, Dark=#E5E7EB}" FontAttributes="Bold"/>
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Toast -->
+        <Grid x:Name="ToastHost" Padding="16" IsVisible="False" InputTransparent="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="32" />
+            </Grid.RowDefinitions>
+            <Border Grid.Row="1" StrokeThickness="0" Padding="12"
+                    BackgroundColor="#CC111827" HorizontalOptions="Center"
+                    StrokeShape="RoundRectangle 14">
+                <Label x:Name="ToastText" TextColor="White"/>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

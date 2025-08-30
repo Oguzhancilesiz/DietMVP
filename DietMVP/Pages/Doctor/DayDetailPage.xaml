@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Doctor.DayDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource Color.Background}"
+    Title="Gün Detayı">
+
+    <ContentPage.Resources>
+        <!-- Slot "pill" stili -->
+        <Style x:Key="Pill" TargetType="Border">
+            <Setter Property="Stroke" Value="#E5E7EB"/>
+            <Setter Property="Background" Value="#F3F4F6"/>
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="12"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HERO: tarih + aksiyonlar -->
+        <Border Padding="16" Margin="16,16,16,8">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="18"/>
+            </Border.StrokeShape>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#8B5CF6" Offset="0"/>
+                    <GradientStop Color="#2563EB" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="8">
+                <Label x:Name="DayTitle"
+                       Grid.ColumnSpan="3"
+                       TextColor="White"
+                       FontFamily="{StaticResource Font.SansBold}"
+                       FontSize="20"/>
+
+                <Button Grid.Row="1" Grid.Column="1"
+                        Text="+ Öğün"
+                        Clicked="OnAddMeal"
+                        Style="{StaticResource Btn.Outline}"
+                        BackgroundColor="#ffffff22"
+                        TextColor="White"/>
+
+                <!--<Button Grid.Row="1" Grid.Column="2"
+                        Text="Günü Kopyala"
+                        Clicked="OnCloneDay"
+                        Style="{StaticResource Btn.Primary}"/>-->
+            </Grid>
+        </Border>
+
+        <!-- İÇERİK -->
+        <Grid Grid.Row="1">
+            <ScrollView>
+                <VerticalStackLayout Padding="16" Spacing="12">
+
+                    <!-- Öğün kartları -->
+                    <CollectionView x:Name="MealsList" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Frame Padding="18" HasShadow="False" CornerRadius="14" BackgroundColor="{StaticResource Color.Surface}">
+                                <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                                    <Label Text="Henüz öğün yok" TextColor="{StaticResource Color.Ink}" FontAttributes="Bold"/>
+                                    <Label Text="Yukarıdaki “+ Öğün” ile ekleyebilirsin."
+                                           FontSize="12" TextColor="{StaticResource Color.Muted}" HorizontalTextAlignment="Center"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </CollectionView.EmptyView>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Style="{StaticResource Card}">
+                                    <VerticalStackLayout Spacing="12">
+
+                                        <!-- Slot başlığı -->
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Label Text="{Binding SlotTr}"
+                                                   FontFamily="{StaticResource Font.SansBold}"
+                                                   FontSize="16"
+                                                   TextColor="{StaticResource Color.Ink}"/>
+                                            <!-- küçük slot etiketi -->
+                                            <Border Grid.Column="1" Style="{StaticResource Pill}">
+                                                <Label Text="{Binding Slot}" FontSize="12" TextColor="#374151"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Saat aralığı -->
+                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                                              RowDefinitions="Auto,Auto"
+                                              ColumnSpacing="8" RowSpacing="4">
+                                            <Label Text="Saat" Grid.RowSpan="2" Grid.Column="0" VerticalOptions="Center"
+                                                   TextColor="{StaticResource Color.Muted}"/>
+
+                                            <Label Text="Başlangıç" Grid.Row="0" Grid.Column="2"
+                                                   FontSize="12" TextColor="{StaticResource Color.Muted}"
+                                                   HorizontalTextAlignment="Center"/>
+                                            <Label Text="Bitiş" Grid.Row="0" Grid.Column="3"
+                                                   FontSize="12" TextColor="{StaticResource Color.Muted}"
+                                                   HorizontalTextAlignment="Center"/>
+
+                                            <TimePicker Grid.Row="1" Grid.Column="2" Time="{Binding StartTime}" />
+                                            <TimePicker Grid.Row="1" Grid.Column="3" Time="{Binding EndTime}" />
+                                        </Grid>
+
+                                        <!-- Başlık / Not -->
+                                        <Entry Placeholder="Başlık (ör. ‘Tavuklu salata’)" Text="{Binding Title}" />
+                                        <Editor Placeholder="Not" Text="{Binding Note}" AutoSize="TextChanges"/>
+
+                                        <!-- Aksiyonlar -->
+                                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                                            <BoxView />
+                                            <Button Grid.Column="1"
+                                                    Text="Yemek Ekle"
+                                                    Clicked="OnAddItem"
+                                                    HeightRequest="40"
+                                                    Style="{StaticResource Btn.Outline}"/>
+                                            <Button Grid.Column="2"
+                                                    Text="Öğünü Kaydet"
+                                                    Clicked="OnSaveMeal"
+                                                    HeightRequest="40"
+                                                    Style="{StaticResource Btn.Primary}"/>
+                                        </Grid>
+
+                                        <!-- Yemek kalemleri -->
+                                        <CollectionView ItemsSource="{Binding Items}">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <SwipeView>
+                                                        <SwipeView.RightItems>
+                                                            <SwipeItems Mode="Reveal">
+                                                                <SwipeItem Text="Sil"
+                                                                           BackgroundColor="{StaticResource Color.Danger}"
+                                                                           Invoked="OnDeleteItem"/>
+                                                            </SwipeItems>
+                                                        </SwipeView.RightItems>
+
+                                                        <Grid Padding="6,4" ColumnDefinitions="*,Auto,Auto">
+                                                            <Label Text="{Binding Name}" Grid.Column="0" TextColor="{StaticResource Color.Ink}"/>
+                                                            <Label Text="{Binding Qty}"  Grid.Column="1" Margin="8,0" TextColor="{StaticResource Color.Muted}"/>
+                                                            <Label Text="{Binding Unit}" Grid.Column="2" TextColor="{StaticResource Color.Muted}"/>
+                                                        </Grid>
+                                                    </SwipeView>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label x:Name="Msg" IsVisible="False" TextColor="{StaticResource Color.Danger}" Margin="4,0"/>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Busy (cam-panel) -->
+            <Grid x:Name="BusyOverlay" BackgroundColor="#80000000" IsVisible="False">
+                <Frame Padding="18" CornerRadius="16" HasShadow="False"
+                       BackgroundColor="#CC111827"
+                       HorizontalOptions="Center" VerticalOptions="Center">
+                    <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="True" Scale="1.1"/>
+                        <Label x:Name="BusyText" Text="Lütfen bekleyin..." TextColor="White" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Toast -->
+            <Grid x:Name="ToastHost" Padding="16" IsVisible="False" InputTransparent="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="32" />
+                </Grid.RowDefinitions>
+                <Frame Grid.Row="1"
+                       CornerRadius="14"
+                       HasShadow="False"
+                       Padding="12"
+                       Opacity="0.95"
+                       BackgroundColor="{StaticResource Color.Ink}"
+                       HorizontalOptions="Center">
+                    <Label x:Name="ToastText"
+                           TextColor="{StaticResource Color.PrimaryInk}"
+                           FontFamily="{StaticResource Font.SansBold}"/>
+                </Frame>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

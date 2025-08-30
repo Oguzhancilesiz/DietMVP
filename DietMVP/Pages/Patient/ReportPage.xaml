@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Patient.ReportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Rapor"
+    Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}"
+    BackgroundColor="{StaticResource Color.Background}">
+
+    <!-- ===== Styles (sadece bu sayfaya özel) ===== -->
+    <ContentPage.Resources>
+
+        <!-- Yumuşak kart -->
+        <Style x:Key="SoftCard" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="18"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Shadow">
+                <Shadow Brush="#000" Opacity="0.06" Radius="12" />
+            </Setter>
+        </Style>
+
+        <!-- Filtre çipi -->
+        <Style x:Key="Chip" TargetType="Button">
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F3F4F6, Dark=#1F2937}"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#111827, Dark=#E5E7EB}"/>
+            <Setter Property="BorderColor" Value="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+
+        <!-- KPI kutusu -->
+        <Style x:Key="KpiTile" TargetType="Border" BasedOn="{StaticResource SoftCard}">
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="6,8"/>
+        </Style>
+
+        <!-- Grup üst bilgisi -->
+        <Style x:Key="GroupHeaderWrap" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="14"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F8FAFF, Dark=#0F172A}"/>
+        </Style>
+
+        <!-- Durum etiketi -->
+        <Style x:Key="Tag" TargetType="Frame">
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="HasShadow" Value="False"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#EEF2FF, Dark=#1F2937}"/>
+            <Setter Property="VerticalOptions" Value="Center"/>
+        </Style>
+
+    </ContentPage.Resources>
+
+    <Grid>
+
+        <!-- Pull to refresh -->
+        <RefreshView x:Name="RefreshHost" Refreshing="OnRefresh">
+            <ScrollView>
+                <VerticalStackLayout Spacing="14">
+
+                    <!-- HERO/HEADER -->
+                    <Border>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18"/>
+                        </Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#8B5CF6" Offset="0" />
+                                <GradientStop Color="#2563EB" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+
+                        <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Border StrokeThickness="0" BackgroundColor="#33111827" WidthRequest="44" HeightRequest="44"
+                                    StrokeShape="RoundRectangle 22" VerticalOptions="Center">
+                                <Label Text="📊" FontSize="22" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Raporlar" TextColor="White" FontSize="22" FontAttributes="Bold"/>
+                                <Label x:Name="LblRange" TextColor="#E5E7EB" FontSize="13"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <!-- FİLTRELER -->
+                    <Border Style="{StaticResource SoftCard}">
+                        <VerticalStackLayout Spacing="12">
+
+                            <!-- Tarih aralığı -->
+                            <Grid ColumnDefinitions="*,16,*" ColumnSpacing="0">
+                                <VerticalStackLayout>
+                                    <Label Text="Başlangıç" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                                    <DatePicker x:Name="DpStart" DateSelected="OnDateChanged"/>
+                                </VerticalStackLayout>
+
+                                <BoxView Grid.Column="1" WidthRequest="16" Opacity="0"/>
+
+                                <VerticalStackLayout Grid.Column="2">
+                                    <Label Text="Bitiş" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                                    <DatePicker x:Name="DpEnd" DateSelected="OnDateChanged"/>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <!-- Hızlı aralık (segment gibi) -->
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                <Button Grid.Column="0" Text="Bugün"   Style="{StaticResource Chip}" CommandParameter="today" Clicked="OnQuickRange"/>
+                                <Button Grid.Column="1" Text="Son 7 gün" Style="{StaticResource Chip}" CommandParameter="7" Clicked="OnQuickRange"/>
+                                <Button Grid.Column="2" Text="Bu Ay"   Style="{StaticResource Chip}" CommandParameter="month" Clicked="OnQuickRange"/>
+                            </Grid>
+
+                            <!-- Durum çipleri -->
+                            <FlexLayout x:Name="StatusChips" Wrap="Wrap" AlignItems="Center" JustifyContent="Start">
+                                <Button Style="{StaticResource Chip}" Text="Tümü"       Clicked="OnStatusChip" ClassId="all"/>
+                                <Button Style="{StaticResource Chip}" Text="Zamanında"  Clicked="OnStatusChip" ClassId="ontime"/>
+                                <Button Style="{StaticResource Chip}" Text="Erken"      Clicked="OnStatusChip" ClassId="early"/>
+                                <Button Style="{StaticResource Chip}" Text="Geç"        Clicked="OnStatusChip" ClassId="late"/>
+                                <Button Style="{StaticResource Chip}" Text="Atlandı"    Clicked="OnStatusChip" ClassId="skipped"/>
+                                <Button Style="{StaticResource Chip}" Text="Kaçırıldı"  Clicked="OnStatusChip" ClassId="missed"/>
+                                <Button Style="{StaticResource Chip}" Text="Devam"      Clicked="OnStatusChip" ClassId="inprog"/>
+                                <Button Style="{StaticResource Chip}" Text="Bekleyen"   Clicked="OnStatusChip" ClassId="upcoming"/>
+                            </FlexLayout>
+                            <!-- Arama + Foto -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Image Source="search.png" HeightRequest="18" Margin="10,0" VerticalOptions="Center"/>
+                                    <Entry Grid.Column="1" x:Name="TxtQuery" Placeholder="Öğün veya not içinde ara…" Completed="OnFilterEnter"/>
+                                    <Button Grid.Column="2" Text="Ara" Style="{StaticResource Chip}" Clicked="OnApplyFilters"/>
+                                </Grid>
+
+                                <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                    <Label Text="Sadece fotoğraflı" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                                    <Switch x:Name="SwPhotos" Toggled="OnPhotoToggle"/>
+                                </HorizontalStackLayout>
+                            </Grid>
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- ÖZET KPIs -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10">
+                        <!-- Toplam -->
+                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource KpiTile}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#334155" Offset="0"/>
+                                    <GradientStop Color="#0F172A" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="Σ" FontSize="22" TextColor="#F8FAFC" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Toplam Öğün" FontSize="12" TextColor="#E2E8F0"/>
+                                    <Label x:Name="SumTotal" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Yapılan -->
+                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource KpiTile}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#10B981" Offset="0"/>
+                                    <GradientStop Color="#059669" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="✅" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Yapılan" FontSize="12" TextColor="#ECFDF5"/>
+                                    <Label x:Name="SumDone" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Zamanında -->
+                        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource KpiTile}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#22C55E" Offset="0"/>
+                                    <GradientStop Color="#16A34A" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="⌛" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Zamanında" FontSize="12" TextColor="#ECFDF5"/>
+                                    <Label x:Name="SumOnTime" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Geç -->
+                        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource KpiTile}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#F59E0B" Offset="0"/>
+                                    <GradientStop Color="#D97706" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="⏱️" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Geç" FontSize="12" TextColor="#FFFBEB"/>
+                                    <Label x:Name="SumLate" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Erken -->
+                        <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource KpiTile}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#06B6D4" Offset="0"/>
+                                    <GradientStop Color="#0891B2" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="⏩" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Erken" FontSize="12" TextColor="#ECFEFF"/>
+                                    <Label x:Name="SumEarly" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Atlandı -->
+                        <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource KpiTile}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#EF4444" Offset="0"/>
+                                    <GradientStop Color="#DC2626" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="🚫" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Atlandı" FontSize="12" TextColor="#FEF2F2"/>
+                                    <Label x:Name="SumSkipped" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Kaçırıldı -->
+                        <Border Grid.Row="3" Grid.Column="0" Style="{StaticResource KpiTile}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#FB7185" Offset="0"/>
+                                    <GradientStop Color="#E11D48" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="❗" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Kaçırıldı" FontSize="12" TextColor="#FFF1F2"/>
+                                    <Label x:Name="SumMissed" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Bekleyen -->
+                        <Border Grid.Row="3" Grid.Column="1" Style="{StaticResource KpiTile}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#6366F1" Offset="0"/>
+                                    <GradientStop Color="#4F46E5" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="🕒" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Bekleyen" FontSize="12" TextColor="#EEF2FF"/>
+                                    <Label x:Name="SumUpcoming" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <!-- GRUPLU LİSTE -->
+                    <CollectionView x:Name="List" IsGrouped="True" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="Bu aralıkta kayıt bulunamadı."
+                                   HorizontalOptions="Center" Margin="0,20"
+                                   TextColor="{StaticResource Color.Muted}"/>
+                        </CollectionView.EmptyView>
+
+                        <!-- Grup Başlığı -->
+                        <CollectionView.GroupHeaderTemplate>
+                            <DataTemplate>
+                                <Grid Padding="0,8,0,0">
+                                    <Border Style="{StaticResource GroupHeaderWrap}">
+                                        <VerticalStackLayout Spacing="8">
+
+                                            <!-- Tarih + ikon -->
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Label Text="📅" FontSize="18"/>
+                                                <Label Text="{Binding Header}" FontAttributes="Bold" FontSize="16"
+                                                       LineBreakMode="TailTruncation"/>
+                                            </HorizontalStackLayout>
+
+                                            <!-- Çipler (wrap) -->
+                                            <FlexLayout Wrap="Wrap" AlignItems="Center" JustifyContent="Start">
+                                                <Frame Style="{StaticResource Tag}" BackgroundColor="#E2E8F0">
+                                                    <Label Text="{Binding Total, StringFormat='Toplam {0}'}"
+                                                           FontSize="12" TextColor="#111827"/>
+                                                </Frame>
+                                                <Frame Style="{StaticResource Tag}" BackgroundColor="#DCFCE7">
+                                                    <Label Text="{Binding Done, StringFormat='Yapılan {0}'}"
+                                                           FontSize="12" TextColor="#065F46"/>
+                                                </Frame>
+                                                <Frame Style="{StaticResource Tag}" BackgroundColor="#FEF3C7">
+                                                    <Label Text="{Binding Late, StringFormat='Geç {0}'}"
+                                                           FontSize="12" TextColor="#92400E"/>
+                                                </Frame>
+                                                <Frame Style="{StaticResource Tag}" BackgroundColor="#FEE2E2">
+                                                    <Label Text="{Binding NotDone, StringFormat='Yapılmadı {0}'}"
+                                                           FontSize="12" TextColor="#991B1B"/>
+                                                </Frame>
+                                            </FlexLayout>
+
+                                            <BoxView HeightRequest="1" Color="#E5E7EB" Opacity="0.8"/>
+
+                                            <!-- Tamamlama barı + özet -->
+                                            <ProgressBar HeightRequest="6" Progress="{Binding CompletionRate}" />
+                                            <Label Text="{Binding SmallSummary}" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.GroupHeaderTemplate>
+
+                        <!-- Öğeler -->
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="4,*" Margin="0,3">
+                                    <!-- sol renk şerit -->
+                                    <BoxView BackgroundColor="{Binding BadgeColor}" />
+                                    <!-- kart -->
+                                    <Border Grid.Column="1" Style="{StaticResource SoftCard}" Padding="12" Margin="8,0,0,0">
+                                        <VerticalStackLayout Spacing="10">
+
+                                            <!-- üst satır: başlık / saat / durum -->
+                                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
+                                                <HorizontalStackLayout Spacing="6">
+                                                    <Label Text="{Binding SlotEmoji}" />
+                                                    <Label Text="{Binding Title}" FontAttributes="Bold" LineBreakMode="TailTruncation"/>
+                                                </HorizontalStackLayout>
+
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding TimeRange}"
+                                                       TextColor="{StaticResource Color.Muted}"
+                                                       HorizontalTextAlignment="End"
+                                                       LineBreakMode="TailTruncation"/>
+
+                                                <Frame Grid.Row="1" Style="{StaticResource Tag}"
+                                                       BackgroundColor="{Binding BadgeColor}">
+                                                    <Label Text="{Binding StatusText}" TextColor="White" FontAttributes="Bold"/>
+                                                </Frame>
+                                                <Label Grid.Row="1" Grid.Column="1"
+                                                       Text="{Binding RelativeText}"
+                                                       TextColor="{StaticResource Color.Muted}"
+                                                       FontSize="12"
+                                                       HorizontalTextAlignment="End"
+                                                       LineBreakMode="TailTruncation"/>
+                                            </Grid>
+
+                                            <!-- içerik maddeleri -->
+                                            <VerticalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding Items}">
+                                                <BindableLayout.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <HorizontalStackLayout Spacing="6">
+                                                            <BoxView WidthRequest="6" HeightRequest="6" CornerRadius="3" Color="#9CA3AF" VerticalOptions="Center"/>
+                                                            <Label Text="{Binding .}" TextColor="{StaticResource Color.Muted}" LineBreakMode="WordWrap"/>
+                                                        </HorizontalStackLayout>
+                                                    </DataTemplate>
+                                                </BindableLayout.ItemTemplate>
+                                            </VerticalStackLayout>
+
+                                            <!-- fotoğraf -->
+                                            <Image HeightRequest="160" Aspect="AspectFill" IsVisible="{Binding HasPhoto}"
+                                                   Source="{Binding PhotoUrl}">
+                                                <Image.Clip>
+                                                    <RoundRectangleGeometry CornerRadius="10"/>
+                                                </Image.Clip>
+                                            </Image>
+
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <BoxView HeightRequest="24" Opacity="0"/>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

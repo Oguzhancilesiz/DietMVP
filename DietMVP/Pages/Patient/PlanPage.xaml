@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Patient.PlanPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Plan"
+    Padding="16,48,16,12"
+    BackgroundColor="{StaticResource Color.Background}">
+    <Label Text="Plan" Style="{StaticResource Text.H1}" />
+</ContentPage>

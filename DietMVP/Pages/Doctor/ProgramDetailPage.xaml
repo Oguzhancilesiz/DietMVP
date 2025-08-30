@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Doctor.ProgramDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Program"
+    Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}"
+    BackgroundColor="{AppThemeBinding Light=#F7F8FA, Dark=#0B1220}">
+
+    <ContentPage.Resources>
+        <!-- Yumuşak kart -->
+        <Style x:Key="SoftCard" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="18"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,10"/>
+            <Setter Property="Shadow">
+                <Shadow Brush="#000" Opacity="0.06" Radius="12" />
+            </Setter>
+        </Style>
+
+        <!-- Chip/Pill -->
+        <Style x:Key="Pill" TargetType="Border">
+            <Setter Property="Stroke" Value="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"/>
+            <Setter Property="Background" Value="{AppThemeBinding Light=#F3F4F6, Dark=#1F2937}"/>
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="12"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+
+        <!-- Pull-to-refresh + Liste -->
+        <RefreshView x:Name="Refresh" Refreshing="OnRefresh">
+            <CollectionView x:Name="DaysList" SelectionMode="None">
+
+                <!-- Üst HERO başlık -->
+                <CollectionView.Header>
+                    <VerticalStackLayout Spacing="12">
+                        <Border>
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="18"/>
+                            </Border.StrokeShape>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#8B5CF6" Offset="0"/>
+                                    <GradientStop Color="#2563EB" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+
+                            <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <Border WidthRequest="44" HeightRequest="44" StrokeThickness="0"
+                                        BackgroundColor="#33111827" StrokeShape="RoundRectangle 22"
+                                        VerticalOptions="Center">
+                                    <Label Text="📅" FontSize="22" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                </Border>
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label x:Name="HeaderRange" Text="Program" TextColor="White" FontSize="22" FontAttributes="Bold"/>
+                                    <Label x:Name="HeaderInfo" TextColor="#E5E7EB" FontSize="13"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </CollectionView.Header>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="24" Spacing="8">
+                        <Label Text="Gün bulunamadı" HorizontalOptions="Center" TextColor="{AppThemeBinding Light=#6B7280, Dark=#94A3B8}"/>
+                        <Label Text="Program günleri henüz oluşturulmamış olabilir." FontSize="12" HorizontalOptions="Center" TextColor="{AppThemeBinding Light=#9CA3AF, Dark=#64748B}"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <!-- Gün kartları -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="4,*" Margin="0,3">
+                            <!-- Sol ince şerit -->
+                            <BoxView BackgroundColor="#E5E7EB" />
+
+                            <!-- Kart -->
+                            <Border Grid.Column="1" Style="{StaticResource SoftCard}" Padding="14" Margin="8,0,0,0">
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
+                                    <!-- Başlıklar -->
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding DateText}"
+                                               FontAttributes="Bold"
+                                               FontSize="16"
+                                               TextColor="{AppThemeBinding Light=#111827, Dark=#E5E7EB}"/>
+                                        <Label Text="{Binding SubtitleText}"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light=#6B7280, Dark=#94A3B8}"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Chevron -->
+                                    <Label Grid.Column="1" Text="›" FontSize="28"
+                                           TextColor="{AppThemeBinding Light=#9CA3AF, Dark=#64748B}"
+                                           VerticalOptions="Center"/>
+
+                                    <!-- Slot chip’leri -->
+                                    <HorizontalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="6"
+                                                           BindableLayout.ItemsSource="{Binding Slots}">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource Pill}">
+                                                    <Label Text="{Binding}" FontSize="12" TextColor="{AppThemeBinding Light=#374151, Dark=#CBD5E1}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </HorizontalStackLayout>
+
+                                    <!-- Alt metin -->
+                                    <Label Grid.Row="2" Grid.ColumnSpan="2"
+                                           Text="{Binding FooterText}"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light=#6B7280, Dark=#94A3B8}"/>
+                                </Grid>
+
+                                <!-- Kart tıklanabilir -->
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnCardTapped"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Animasyonlu Busy Overlay (ortada kart) -->
+        <Grid x:Name="BusyOverlay" IsVisible="False" InputTransparent="False"
+              BackgroundColor="{AppThemeBinding Light=#00000066, Dark=#00000099}">
+            <Border x:Name="BusyCard" Padding="16" StrokeThickness="0" Opacity="0" Scale="0.96"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFFFF, Dark=#172033F0}"
+                    HorizontalOptions="Center" VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="True"/>
+                    <Label x:Name="BusyText" Text="Yükleniyor..."
+                           TextColor="{AppThemeBinding Light=#111827, Dark=#E5E7EB}" FontAttributes="Bold"/>
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

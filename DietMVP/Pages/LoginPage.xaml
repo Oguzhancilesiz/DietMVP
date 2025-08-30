@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Giriş"
+    BackgroundColor="{StaticResource Color.Background}">
+
+    <Grid Padding="{OnPlatform iOS='24,56,24,24', Android='24,32,24,24'}">
+
+        <!-- Ortalamak için 3 sütun: *, Auto, * -->
+        <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,Auto,*">
+            <!-- (İsteğe bağlı) üst boşluk -->
+            <BoxView Grid.ColumnSpan="3" HeightRequest="12" Opacity="0"/>
+
+            <!-- Ortadaki sütunda kart -->
+            <Border Grid.Column="1"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"
+                    StrokeThickness="0"
+                    Padding="18"
+                    WidthRequest="{OnIdiom Phone=340, Tablet=480, Desktop=520}">
+                <Border.Shadow>
+                    <Shadow Brush="#000" Opacity="0.08" Radius="16"/>
+                </Border.Shadow>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <!-- Başlık -->
+                    <VerticalStackLayout Spacing="2" Margin="0,2,0,8">
+                        <Label Text="DietMVP" FontSize="14" TextColor="{StaticResource Color.Muted}"/>
+                        <Label Text="Hesabınla giriş yap" FontAttributes="Bold" FontSize="22"
+                               TextColor="{StaticResource Color.Ink}"/>
+                        <Label Text="Doktor ve hasta hesapları bu ekrandan giriş yapar."
+                               FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                    </VerticalStackLayout>
+
+                    <!-- E-posta -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="E-posta" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                        <Border Stroke="#E5E7EB" StrokeThickness="1" Background="{AppThemeBinding Light=#FAFAFA, Dark=#0B1220}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Entry x:Name="EmailEntry"
+                                   Placeholder="ornek@email.com"
+                                   Keyboard="Email"
+                                   ReturnType="Next"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Şifre + göster -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Şifre" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Border Grid.Column="0" Stroke="#E5E7EB" StrokeThickness="1" Background="{AppThemeBinding Light=#FAFAFA, Dark=#0B1220}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12"/>
+                                </Border.StrokeShape>
+                                <Entry x:Name="PwEntry"
+                                       Placeholder="Şifre"
+                                       IsPassword="True"
+                                       ReturnType="Go"
+                                       Completed="OnLogin"/>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="End" VerticalOptions="Center">
+                                <CheckBox x:Name="CbShowPwd" CheckedChanged="OnTogglePwd"/>
+                                <Label Text="Göster" FontSize="10" HorizontalTextAlignment="Center"
+                                       TextColor="{StaticResource Color.Muted}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Durum/Hata -->
+                    <Label x:Name="Status" IsVisible="False" TextColor="IndianRed" FontSize="12"/>
+
+                    <!-- Giriş butonu -->
+                    <Button Text="Giriş Yap"
+                            Clicked="OnLogin"
+                            HeightRequest="48"
+                            CornerRadius="14"
+                            Style="{StaticResource Btn.Primary}"/>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Alt-sheet tarzı busy -->
+        <Grid x:Name="BusyOverlay" IsVisible="False" InputTransparent="False">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="1" x:Name="BusyCard" TranslationY="40" Opacity="0"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFFFF, Dark=#172033F0}"
+                    StrokeThickness="0" Padding="14" Margin="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="True"/>
+                    <Label x:Name="BusyText" Text="Giriş yapılıyor..."
+                           TextColor="{AppThemeBinding Light=#111827, Dark=#E5E7EB}"
+                           FontAttributes="Bold"/>
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

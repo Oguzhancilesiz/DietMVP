@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="DietMVP.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:doctor="clr-namespace:DietMVP.Pages.Doctor"
+    FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="True"              
+    Shell.BackgroundColor="{StaticResource Color.Surface}"
+    Shell.ForegroundColor="{StaticResource Color.Ink}"
+    Shell.TitleColor="{StaticResource Color.Ink}"
+    Shell.TabBarBackgroundColor="{StaticResource Color.TabbarBg}"
+    Shell.TabBarForegroundColor="{StaticResource Color.TabbarActive}"
+    Shell.TabBarTitleColor="{StaticResource Color.TabbarActive}"
+    Shell.TabBarUnselectedColor="{StaticResource Color.TabbarInactive}">
+
+    <Shell.ToolbarItems>
+        <ToolbarItem Text="Çıkış"
+                     IconImageSource="ic_logout.png" 
+            Order="Primary"
+                     Priority="0"
+                     Clicked="OnLogout" />
+    </Shell.ToolbarItems>
+
+    <TabBar>
+        <Tab Title="Dashboard" Icon="ic_dashboard.png" Route="dashboard">
+            <ShellContent Route="dashboard" ContentTemplate="{DataTemplate doctor:DashboardPage}" />
+        </Tab>
+        <Tab Title="Kişiler" Icon="ic_people.png" Route="patients">
+            <ShellContent Route="patients" ContentTemplate="{DataTemplate doctor:PatientsPage}" />
+        </Tab>
+        <Tab Title="Ekle" Icon="ic_add.png" Route="quickcreate">
+            <ShellContent Route="quickcreate" ContentTemplate="{DataTemplate doctor:QuickCreatePage}" />
+        </Tab>
+        <Tab Title="Sorular" Icon="question.png" Route="sorucevap">
+            <ShellContent Route="sorucevap" ContentTemplate="{DataTemplate doctor:DoctorQuestionsPage}" />
+        </Tab>
+        <Tab Title="Ayarlar" Icon="ic_settings.png" Route="settings">
+            <ShellContent Route="settings" ContentTemplate="{DataTemplate doctor:SettingsPage}" />
+        </Tab>
+    </TabBar>
+</Shell>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Patient.SettingsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Ayarlar"
+    Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}"
+    BackgroundColor="{AppThemeBinding Light=#F7F8FA, Dark=#0B1220}">
+
+    <ContentPage.Resources>
+        <!-- kart -->
+        <Style x:Key="SoftCard" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="18"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Shadow">
+                <Shadow Brush="#000" Opacity="0.06" Radius="12"/>
+            </Setter>
+        </Style>
+        <Style x:Key="Muted" TargetType="Label">
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#6B7280, Dark=#94A3B8}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style x:Key="PrimaryBtn" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="#6D28D9"/>
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="HeightRequest" Value="48"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+        </Style>
+        <Style x:Key="DangerBtn" TargetType="Button" BasedOn="{StaticResource PrimaryBtn}">
+            <Setter Property="BackgroundColor" Value="#EF4444"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="14">
+
+                <!-- HERO -->
+                <Border>
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="18"/>
+                    </Border.StrokeShape>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#8B5CF6" Offset="0"/>
+                            <GradientStop Color="#2563EB" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+
+                    <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border StrokeThickness="0" BackgroundColor="#33111827" WidthRequest="48" HeightRequest="48"
+                    StrokeShape="RoundRectangle 24" VerticalOptions="Center">
+                            <Label Text="👤" FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Hesap" TextColor="White" FontSize="20" FontAttributes="Bold"/>
+                            <Label x:Name="LblEmail" TextColor="#E5E7EB" FontSize="13"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- PROFİL BİLGİLERİ -->
+                <Border Style="{StaticResource SoftCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Profil Bilgileri" FontAttributes="Bold" FontSize="16"/>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto">
+                            <Label Text="Ad Soyad" VerticalTextAlignment="Center"/>
+                            <Entry x:Name="TxtFullName" Grid.Column="1" Placeholder="Ad Soyad"/>
+                            <Label Grid.Row="1" Text="Telefon" VerticalTextAlignment="Center"/>
+                            <Entry Grid.Row="1" Grid.Column="1" x:Name="TxtPhone" Keyboard="Telephone" Placeholder="+90 ..."/>
+                            <Label Grid.Row="2" Text="Günlük Su" VerticalTextAlignment="Center"/>
+                            <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                <Stepper x:Name="StepWater" Minimum="1000" Maximum="5000" Increment="100" Value="2000" ValueChanged="OnWaterChanged"
+                         WidthRequest="140"/>
+                                <ProgressBar Grid.Column="1" x:Name="WaterBar" HeightRequest="8" VerticalOptions="Center"/>
+                                <Label Grid.Column="2" x:Name="LblWater" Text="2000 ml" VerticalTextAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+                        <Button Text="Profili Kaydet" Style="{StaticResource PrimaryBtn}" Clicked="OnSaveProfile"/>
+                        <Label Text="Not: Profil değişiklikleri yalnızca size aittir." Style="{StaticResource Muted}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- E-POSTA DEĞİŞTİR -->
+                <Border Style="{StaticResource SoftCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="E-posta Değiştir" FontAttributes="Bold" FontSize="16"/>
+                        <Entry x:Name="NewEmail" Keyboard="Email" Placeholder="yeni@email.com"/>
+                        <Entry x:Name="NewEmail2" Keyboard="Email" Placeholder="yeni@email.com (tekrar)"/>
+                        <Entry x:Name="PwdForEmail" IsPassword="True" Placeholder="Mevcut şifre (güvenlik)"/>
+                        <Button Text="E-postayı Güncelle" Style="{StaticResource PrimaryBtn}" Clicked="OnUpdateEmail"/>
+                        <Label Text="Yeni e-posta için doğrulama maili gönderilir." Style="{StaticResource Muted}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ŞİFRE DEĞİŞTİR -->
+                <Border Style="{StaticResource SoftCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Şifre Değiştir" FontAttributes="Bold" FontSize="16"/>
+                        <Entry x:Name="OldPwd" IsPassword="True" Placeholder="Mevcut şifre"/>
+                        <Entry x:Name="NewPwd" IsPassword="True" Placeholder="Yeni şifre (min 8)"/>
+                        <Entry x:Name="NewPwd2" IsPassword="True" Placeholder="Yeni şifre (tekrar)"/>
+                        <Button Text="Şifreyi Güncelle" Style="{StaticResource PrimaryBtn}" Clicked="OnUpdatePassword"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- BİLDİRİM KISAYOLLARI (opsiyonel) -->
+                <Border Style="{StaticResource SoftCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Bildirimler" FontAttributes="Bold" FontSize="16"/>
+                        <HorizontalStackLayout Spacing="8">
+                            <Button Text="İzin İste" Clicked="OnAskPermission"/>
+                            <Button Text="Test" Clicked="OnTestNotification"/>
+                            <Button Text="Temizle" Clicked="OnClearAll"/>
+                        </HorizontalStackLayout>
+                        <Label Text="iOS’ta ön planda banner gelmeyebilir, arka planda deneyin." Style="{StaticResource Muted}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="Çıkış Yap" Style="{StaticResource DangerBtn}" Clicked="OnSignOut"/>
+
+                <Label x:Name="Msg" IsVisible="False" TextColor="#B91C1C" />
+                <BoxView HeightRequest="24" Opacity="0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Busy -->
+        <Grid x:Name="BusyOverlay" BackgroundColor="#80000000" IsVisible="False">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                <ActivityIndicator IsRunning="True" Scale="1.2"/>
+                <Label x:Name="BusyText" Text="Lütfen bekleyin..." TextColor="White" FontAttributes="Bold"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Toast -->
+        <Grid x:Name="ToastHost" Padding="16" IsVisible="False" InputTransparent="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="32"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="1" StrokeThickness="0" Padding="12" BackgroundColor="#CC111827" HorizontalOptions="Center"
+              StrokeShape="RoundRectangle 14">
+                <Label x:Name="ToastText" TextColor="White"/>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

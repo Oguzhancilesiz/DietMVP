@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Doctor.ReportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{StaticResource Color.Background}"
+    Title="Rapor"
+    Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}">
+
+    <ContentPage.Resources>
+        <!-- Rozet -->
+        <Style x:Key="Badge" TargetType="Frame">
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="HasShadow" Value="False"/>
+            <Setter Property="BackgroundColor" Value="#E5E7EB"/>
+        </Style>
+        <!-- Yumuşak kart -->
+        <Style x:Key="SoftCard" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="18"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Shadow">
+                <Shadow Brush="#000" Opacity="0.06" Radius="12" />
+            </Setter>
+        </Style>
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Detay" Clicked="OnReportDetailClicked"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <!-- Gradient HERO -->
+        <Border>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="18"/>
+            </Border.StrokeShape>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#6D28D9" Offset="0"/>
+                    <GradientStop Color="#4F46E5" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Border WidthRequest="44" HeightRequest="44" StrokeThickness="0"
+                        BackgroundColor="#33111827" StrokeShape="RoundRectangle 22"
+                        VerticalOptions="Center">
+                    <Label Text="📊" FontSize="22" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label x:Name="HeaderTitle" Text="Rapor" TextColor="White" FontSize="22" FontAttributes="Bold"/>
+                    <Label x:Name="HdrRange" TextColor="#E5E7EB" FontSize="13"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="12">
+
+                <!-- ÖZET -->
+                <Border Style="{StaticResource SoftCard}">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                        <Label Text="Gün" TextColor="{StaticResource Color.Muted}"/>
+                        <Label x:Name="SumDays" Grid.Column="1" FontFamily="{StaticResource Font.SansBold}"/>
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                            <Label>
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Öğün: " TextColor="{StaticResource Color.Muted}"/>
+                                        <Span x:Name="SumMealPlanned"/>
+                                        <Span Text=" plan • " TextColor="{StaticResource Color.Muted}"/>
+                                        <Span x:Name="SumMealDone"/>
+                                        <Span Text=" yapıldı • " TextColor="{StaticResource Color.Muted}"/>
+                                        <Span x:Name="SumMealSkipped"/>
+                                        <Span Text=" kaçırıldı" TextColor="{StaticResource Color.Muted}"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Frame Grid.Column="1" Style="{StaticResource Badge}" BackgroundColor="#2563EB">
+                                <Label x:Name="SumAdh" TextColor="White" FontAttributes="Bold" />
+                            </Frame>
+                            <Label Grid.Column="2" x:Name="SumAdhDesc" TextColor="{StaticResource Color.Muted}" />
+                        </Grid>
+
+                        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <Label>
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Su: " TextColor="{StaticResource Color.Muted}"/>
+                                        <Span x:Name="SumWaterLiters"/>
+                                        <Span Text=" L toplam • " TextColor="{StaticResource Color.Muted}"/>
+                                        <Span x:Name="AvgWaterLiters"/>
+                                        <Span Text=" L/gün ort." TextColor="{StaticResource Color.Muted}"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Frame Grid.Column="1" Style="{StaticResource Badge}">
+                                <Label x:Name="SumRange" />
+                            </Frame>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Başlık + Detay -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Günlük Liste" Style="{StaticResource Text.H2}" />
+                    <Button Grid.Column="1" Text="Detay" Padding="12,6" Clicked="OnReportDetailClicked" />
+                </Grid>
+
+                <!-- GÜNLER -->
+                <CollectionView x:Name="DaysList" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Kayıt yok." HorizontalOptions="Center" TextColor="{StaticResource Color.Muted}" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource SoftCard}">
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                    <Label Text="{Binding DateText}" FontAttributes="Bold" />
+                                    <Frame Grid.Column="1" Style="{StaticResource Badge}" BackgroundColor="{Binding BadgeColor}">
+                                        <Label Text="{Binding AdherenceLabel}" TextColor="White" FontAttributes="Bold"/>
+                                    </Frame>
+
+                                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Öğün: " TextColor="{StaticResource Color.Muted}"/>
+                                                    <Span Text="{Binding Done}"/>
+                                                    <Span Text="/" TextColor="{StaticResource Color.Muted}"/>
+                                                    <Span Text="{Binding Planned}"/>
+                                                    <Span Text=" • " TextColor="{StaticResource Color.Muted}"/>
+                                                    <Span Text="{Binding Skipped}"/>
+                                                    <Span Text=" kaçırıldı" TextColor="{StaticResource Color.Muted}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label Grid.Column="1" Text="{Binding WaterLitersText}" TextColor="{StaticResource Color.Muted}"/>
+                                        <Label Grid.Column="2" Text="{Binding StatusText}" TextColor="{StaticResource Color.Muted}" />
+                                    </Grid>
+
+                                    <ProgressBar Grid.Row="2" Progress="{Binding Adherence}" HeightRequest="6"
+                                                 BackgroundColor="{AppThemeBinding Light=#EEF2FF, Dark=#1F2937}"
+                                                 ProgressColor="#6D28D9"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- PROGRAMI BİTEN HASTALAR -->
+                <Label Text="Programı Biten Hastalar (Son 30 Gün)" Style="{StaticResource Text.H2}" />
+                <Border x:Name="EndedCard" Style="{StaticResource SoftCard}" IsVisible="False">
+                    <CollectionView x:Name="EndedList" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="Bu aralıkta programı biten hasta yok." HorizontalOptions="Center" TextColor="{StaticResource Color.Muted}" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="4">
+                                    <!-- Avatar -->
+                                    <Border WidthRequest="40" HeightRequest="40" StrokeThickness="0"
+                                            BackgroundColor="{StaticResource Color.Border}"
+                                            StrokeShape="RoundRectangle 20" VerticalOptions="Center">
+                                        <Label Text="👤" FontSize="18" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- İsim + bitti bilgisi -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                        <Label Text="{Binding EndText}" FontSize="12" TextColor="{StaticResource Color.Muted}"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Yeni program -->
+                                    <Button Grid.Column="2" Text="Yeni Program" Padding="10,6" CornerRadius="12"
+                                            Clicked="OnCreateProgramForEnded" CommandParameter="{Binding .}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+
+                <BoxView HeightRequest="24" Opacity="0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Busy Overlay -->
+        <Grid x:Name="BusyOverlay" Grid.RowSpan="2" BackgroundColor="#80000000" IsVisible="False" InputTransparent="True">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                <ActivityIndicator IsRunning="True" Scale="1.2"/>
+                <Label x:Name="BusyText" Text="Yükleniyor..." TextColor="White" FontAttributes="Bold" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

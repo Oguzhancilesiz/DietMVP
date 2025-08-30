@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Patient.PatientQaPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Sorularım"
+    Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}"
+    BackgroundColor="{StaticResource Color.Background}">
+
+    <!-- ===== Styles (sayfaya özel) ===== -->
+    <ContentPage.Resources>
+        <!-- Kart -->
+        <Style x:Key="SoftCard" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="18"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Shadow">
+                <Shadow Brush="#000" Opacity="0.06" Radius="12"/>
+            </Setter>
+        </Style>
+
+        <!-- Chip -->
+        <Style x:Key="Chip" TargetType="Button">
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F3F4F6, Dark=#1F2937}"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#111827, Dark=#E5E7EB}"/>
+            <Setter Property="BorderColor" Value="{AppThemeBinding Light=#E5E7EB, Dark=#374151}"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+
+        <!-- İnce etiket -->
+        <Style x:Key="Tag" TargetType="Border" BasedOn="{StaticResource SoftCard}">
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="BackgroundColor" Value="#EEF2FF"/>
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="10"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Shadow">
+                <Shadow Opacity="0"/>
+            </Setter>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <Style x:Key="Muted" TargetType="Label">
+            <Setter Property="TextColor" Value="{StaticResource Color.Muted}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style x:Key="PrimaryBtn" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="#4F46E5"/>
+            <Setter Property="TextColor" Value="White"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="HeightRequest" Value="48"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="14">
+
+                <!-- HERO -->
+                <Border>
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="18"/>
+                    </Border.StrokeShape>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#8B5CF6" Offset="0"/>
+                            <GradientStop Color="#2563EB" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border StrokeThickness="0" BackgroundColor="#33111827" WidthRequest="48" HeightRequest="48"
+                    StrokeShape="RoundRectangle 24" VerticalOptions="Center">
+                            <Label Text="💬" FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Sor Doktoruna" TextColor="White" FontSize="20" FontAttributes="Bold"/>
+                            <Label x:Name="LblDoctorInfo" Text="Doktor bilgisi yükleniyor..."
+                     TextColor="#E5E7EB" FontSize="13"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- FORM -->
+                <Border Style="{StaticResource SoftCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Entry x:Name="TxtTitle" Placeholder="Konu / Başlık"/>
+                        <Editor x:Name="EdBody" Placeholder="Sorunuz…" AutoSize="TextChanges" HeightRequest="120"/>
+                        <Button Text="Gönder" Style="{StaticResource PrimaryBtn}" Clicked="OnSend"/>
+                        <Label Text="Kısa ve net yazarsanız daha hızlı yanıt alırsınız." Style="{StaticResource Muted}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- FİLTRELER -->
+                <FlexLayout x:Name="ChipBar" Wrap="Wrap" AlignItems="Center" JustifyContent="Start">
+                    <Button Style="{StaticResource Chip}" Text="Tümü"       Clicked="OnChip" ClassId="all"/>
+                    <Button Style="{StaticResource Chip}" Text="Cevapsız"   Clicked="OnChip" ClassId="open"/>
+                    <Button Style="{StaticResource Chip}" Text="Yanıtlandı" Clicked="OnChip" ClassId="answered"/>
+                </FlexLayout>
+
+                <!-- LİSTE -->
+                <CollectionView x:Name="List" SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Henüz soru yok." HorizontalOptions="Center" Margin="0,20"
+                   TextColor="{StaticResource Color.Muted}"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <!-- Sol renk şerit + kart -->
+                            <Grid ColumnDefinitions="4,*" Margin="0,3">
+                                <BoxView BackgroundColor="{Binding BadgeColor}" />
+                                <Border Grid.Column="1" Style="{StaticResource SoftCard}" Padding="12" Margin="8,0,0,0">
+                                    <VerticalStackLayout Spacing="10">
+
+                                        <!-- üst satır -->
+                                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Label Text="🗂️"/>
+                                                <Label Text="{Binding Title}" FontAttributes="Bold" LineBreakMode="TailTruncation"/>
+                                            </HorizontalStackLayout>
+
+                                            <Border Grid.Column="1" BackgroundColor="{Binding BadgeColor}" Padding="8,4"
+                              StrokeShape="RoundRectangle 10" StrokeThickness="0" VerticalOptions="Start">
+                                                <Label Text="{Binding StatusText}" TextColor="White" FontAttributes="Bold"/>
+                                            </Border>
+
+                                            <Label Grid.Row="1" Grid.ColumnSpan="2"
+                             Text="{Binding CreatedAt, StringFormat='Soruldu: {0:dd.MM.yyyy HH:mm}'}"
+                             Style="{StaticResource Muted}"/>
+                                        </Grid>
+
+                                        <!-- soru metni -->
+                                        <Label Text="{Binding Body}" LineBreakMode="WordWrap"/>
+
+                                        <!-- yanıt bölümü (yanıt yoksa kibar placeholder) -->
+                                        <Border BackgroundColor="{AppThemeBinding Light=#F5F3FF, Dark=#1F2937}"
+                            StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10">
+                                            <VerticalStackLayout Spacing="4">
+                                                <Label Text="Yanıt" FontAttributes="Bold"/>
+                                                <Label Text="{Binding AnswerText}" LineBreakMode="WordWrap"
+                               TextColor="{AppThemeBinding Light=#111827, Dark=#E5E7EB}">
+                                                    <Label.Triggers>
+                                                        <!-- boşsa yer tutucu göster -->
+                                                        <DataTrigger TargetType="Label" Binding="{Binding AnswerText}" Value="">
+                                                            <Setter Property="Text" Value="(henüz yanıt yok)"/>
+                                                            <Setter Property="TextColor" Value="{StaticResource Color.Muted}"/>
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <Label Text="{Binding AnsweredAt, StringFormat='Yanıt: {0:dd.MM.yyyy HH:mm}'}"
+                               Style="{StaticResource Muted}"/>
+                                            </VerticalStackLayout>
+                                        </Border>
+
+                                    </VerticalStackLayout>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <BoxView HeightRequest="24" Opacity="0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

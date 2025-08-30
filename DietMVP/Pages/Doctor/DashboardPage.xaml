@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<?xaml-comp compile="true" ?>
+<ContentPage
+    x:Class="DietMVP.Pages.Doctor.DashboardPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:DietMVP.Controls"
+    Title="Dashboard"
+    Padding="{OnPlatform iOS='16,56,16,12', Android='16,32,16,12'}"
+    BackgroundColor="{StaticResource Color.Background}">
+
+    <ContentPage.Resources>
+        <!-- Yumuşak kart -->
+        <Style x:Key="SoftCard" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="18"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFFFFF, Dark=#111827}"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,8"/>
+            <Setter Property="Shadow">
+                <Shadow Brush="#000" Opacity="0.06" Radius="12"/>
+            </Setter>
+        </Style>
+
+        <!-- KPI karo -->
+        <Style x:Key="KpiCard" TargetType="Border" BasedOn="{StaticResource SoftCard}">
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+
+        <Style x:Key="Muted" TargetType="Label">
+            <Setter Property="TextColor" Value="{StaticResource Color.Muted}"/>
+        </Style>
+
+        <!-- Küçük badge/pill -->
+        <Style x:Key="Pill" TargetType="Border">
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="12"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="BackgroundColor" Value="#F3F4F6"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <!-- Pull-to-refresh -->
+        <RefreshView x:Name="RefreshHost" Refreshing="OnRefresh">
+            <ScrollView>
+                <VerticalStackLayout Spacing="14">
+
+                    <!-- HERO -->
+                    <Border>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="20"/>
+                        </Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#8B5CF6" Offset="0"/>
+                                <GradientStop Color="#2563EB" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+
+                        <Grid Padding="16" ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                            <Border WidthRequest="54" HeightRequest="54" BackgroundColor="#33111827" StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="27"/>
+                                </Border.StrokeShape>
+                                <Label Text="📊" FontSize="26" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label x:Name="DayTitle" Text="Dashboard" TextColor="White" FontSize="22" FontAttributes="Bold"/>
+                                <Label x:Name="LblToday" TextColor="#E5E7EB" FontSize="13"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <!-- 2x2 KPI -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+
+                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource KpiCard}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#334155" Offset="0"/>
+                                    <GradientStop Color="#0F172A" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="🧑‍⚕️" FontSize="22" VerticalTextAlignment="Center" TextColor="#F8FAFC"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Toplam Hasta" FontSize="12" TextColor="#E2E8F0"/>
+                                    <Label x:Name="LblPatients" Text="0" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource KpiCard}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#10B981" Offset="0"/>
+                                    <GradientStop Color="#059669" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="📅" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Aktif Program" FontSize="12" TextColor="#ECFDF5"/>
+                                    <Label x:Name="LblActivePrograms" Text="0" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource KpiCard}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#06B6D4" Offset="0"/>
+                                    <GradientStop Color="#0891B2" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="🍽️" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Bugünkü Öğün" FontSize="12" TextColor="#ECFEFF"/>
+                                    <Label x:Name="LblMealsToday" Text="0 / 0" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource KpiCard}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#6366F1" Offset="0"/>
+                                    <GradientStop Color="#4F46E5" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <HorizontalStackLayout Spacing="12">
+                                <Label Text="💧" FontSize="22" VerticalTextAlignment="Center"/>
+                                <VerticalStackLayout>
+                                    <Label Text="Bugünkü Su (toplam)" FontSize="12" TextColor="#EEF2FF"/>
+                                    <Label x:Name="LblWaterToday" Text="0 L" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <!-- Mini çağrılar -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Border Style="{StaticResource SoftCard}">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Cevapsız Sorular" FontAttributes="Bold"/>
+                                    <Label x:Name="LblOpenQsDesc" Style="{StaticResource Muted}" FontSize="12"/>
+                                </VerticalStackLayout>
+
+                                <!-- SAYIYI BU BUTONDA GÖSTERECEĞİZ -->
+                                <Button x:Name="BtnOpenQs"
+                    Grid.Column="1"
+                    Text="0"
+                    CornerRadius="12"
+                    HeightRequest="36"
+                    Padding="14,0"
+                    Clicked="GoQuestions" />
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="1" Style="{StaticResource SoftCard}">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Yakında Biten Programlar" FontAttributes="Bold"/>
+                                    <Label x:Name="LblEndingSoonDesc" Style="{StaticResource Muted}" FontSize="12"/>
+                                </VerticalStackLayout>
+
+                                <!-- SAYIYI BU BUTONDA GÖSTERECEĞİZ -->
+                                <Button x:Name="BtnEndingSoon"
+                    Grid.Column="1"
+                    Text="0"
+                    CornerRadius="12"
+                    HeightRequest="36"
+                    Padding="14,0"
+                    Clicked="ScrollToExpiring" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- Hızlı aksiyonlar -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Button Text="Yeni Hasta" Clicked="GoNewPatient" Style="{StaticResource Btn.Primary}"/>
+                        <Button Grid.Column="1" Text="Hastaları Listele" Clicked="GoPatients" Style="{StaticResource Btn.Outline}"/>
+                    </Grid>
+                    <Button Text="Var Olan Hastaya Program" Clicked="GoProgramForExisting" Style="{StaticResource Btn.Outline}"/>
+
+                    <!-- Biten programlar -->
+                    <Label x:Name="SectionExpiring" Text="Bitişine Az Kalanlar" Style="{StaticResource Text.H2}" />
+                    <CollectionView x:Name="ExpiringList" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="Yakında biten program yok." HorizontalOptions="Center" Margin="0,12" Style="{StaticResource Muted}"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource SoftCard}">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10">
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding PatientName}" FontAttributes="Bold" />
+                                            <Label Text="{Binding Range}" Style="{StaticResource Muted}" FontSize="12"/>
+                                        </VerticalStackLayout>
+
+                                        <Border Grid.RowSpan="2" Grid.Column="1" Style="{StaticResource Pill}" BackgroundColor="#FEF3C7">
+                                            <Label Text="{Binding DaysLeftText}" TextColor="#92400E" FontAttributes="Bold"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <ProgressBar Progress="{Binding Progress}" HeightRequest="6"/>
+                                            <Button Grid.Column="1" Text="Aç" HeightRequest="36" CornerRadius="10"
+                                                    Clicked="OpenProgram" CommandParameter="{Binding .}"
+                                                    Style="{StaticResource Btn.Outline}" />
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Son Aktivite (placeholder) -->
+                    <Label Text="Son Aktivite" Style="{StaticResource Text.H2}" />
+                    <CollectionView x:Name="MealsList">
+                        <CollectionView.EmptyView>
+                            <Label Text="Gösterilecek öğe yok." HorizontalOptions="Center" Margin="0,12" Style="{StaticResource Muted}"/>
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+
+                    <BoxView HeightRequest="24" Opacity="0"/>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+
+        <!-- Alt sheet busy -->
+        <Grid x:Name="BusyOverlay" IsVisible="False" InputTransparent="False">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="1" x:Name="BusyCard" TranslationY="40" Opacity="0"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFFFF, Dark=#172033F0}"
+                    StrokeThickness="0" Padding="14" Margin="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18"/>
+                </Border.StrokeShape>
+                <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="True"/>
+                    <Label x:Name="BusyText" TextColor="{AppThemeBinding Light=#111827, Dark=#E5E7EB}" FontAttributes="Bold"/>
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Toast -->
+        <controls:ToastOverlay x:Name="ToastHost" InputTransparent="False" />
+    </Grid>
+</ContentPage>
